@@ -1,8 +1,7 @@
 class Player {
   constructor (id) {
     this.sprites = {
-      idle: loadImage('assets/char_idle.png'),
-      attack: loadImage('assets/char_attack.png')
+      idle: loadImage('assets/char_idle.png')
     }
     this.id = id;
     this.x = 150;
@@ -84,11 +83,12 @@ class Player {
   }
 
   draw(){
-    if(this.attacking){
-      image(this.sprites.attack, this.x,this.y)
-    }else {
-      image(this.sprites.idle, this.x,this.y)
-    }
+    image(this.sprites.idle)
+    // if(this.attacking){
+    //   image(this.sprites.attack, this.x,this.y)
+    // }else {
+    //   image(this.sprites.idle, this.x,this.y)
+    // }
     
   }
 }
