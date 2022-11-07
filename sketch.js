@@ -13,6 +13,10 @@ function setup() {
   
   player2.x = 300;
 
+  player2.keys.left = 37;
+  player2.keys.right = 39;
+  player2.keys.jump = 17;
+  player2.keys.punch = 16;
 }
 
 function draw() {
