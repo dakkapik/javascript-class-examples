@@ -1,7 +1,8 @@
 class Player {
   constructor (id) {
     this.sprites = {
-      idle: loadImage('assets/char_idle.png')
+      idle: loadImage('assets/char_idle.png'),
+      // attack: loadImage('assets/char_attack.png')
     }
     this.id = id;
     this.x = 150;
@@ -83,7 +84,8 @@ class Player {
   }
 
   draw(){
-    image(this.sprites.idle)
+    //COMMENTED THIS TO ONLY USE ONE SPRITE
+    image(this.sprites.idle, this.x, this.y)
     // if(this.attacking){
     //   image(this.sprites.attack, this.x,this.y)
     // }else {
