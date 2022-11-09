@@ -6,6 +6,7 @@ class Game {
     this.gravity = 0.5;
     this.keyPressed = new Set();
     this.entities = {};
+    this.eId = [];
     
     document.addEventListener("keydown", (e) => {
       this.keyPressed.add(e.keyCode)
@@ -18,22 +19,43 @@ class Game {
   
   addEntity (x, y, width, height) {
     let id = Date.now().toString();
+    this.eId.push(id)
     this.entities[id] = new Box(x, y, width, height, id);
   }
   
-  addPlayer () {
+  addPlayer (x, move) {
     let id = Date.now().toString();
-    this.entities[id] = new Player(id);
+    this.eId.push(id)
+    this.entities[id] = new Player(id, x, move);
   }
   
   update() {
-    Object.keys(this.entities).forEach((id)=> {
+    this.eId.forEach(id => {
+      // console.log(this.entities[id])
+      this.collision(id)
       this.entities[id].update()
     })
   }
   
-  collision (id) {
-     
+  collision (subjectId) {
+    for(let target = 0; target < this.eId.length; target++){
+      if(this.eId[target] !== subjectId) {
+        let targetId = this.eId[target]
+        if(
+          
+          this.entities[subjectId].x < this.entities[targetId].getRight() &&
+          this.entities[subjectId].getRight() > this.entities[targetId].x &&
+          this.entities[subjectId].y < this.entities[targetId].getDown() &&
+          this.entities[subjectId].getDown() > this.entities[targetId].y
+          
+          
+          ) {
+            this.entities[subjectId].collision()
+            this.entities[targetId].collision()
+          
+        }
+      }
+    }
   }
   
   drawFloor () {

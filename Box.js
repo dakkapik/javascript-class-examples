@@ -6,7 +6,7 @@ class Box {
       this.width = width;
       this.height = height;
       this.color = "white";
-      this.collision = true;
+      // this.collision = true;
     }
     
     setCollision (bool) {
@@ -15,6 +15,12 @@ class Box {
         return;
       }
       return new Error("collision must be boolean")
+    }
+    getRight(){
+      return this.x + this.width;
+    }
+    getDown() {
+      return this.y + this.height;
     }
     
     setColor(color) {
@@ -34,4 +40,9 @@ class Box {
       rect(this.x, this.y, this.width, this.height);
     }
     
+    collision() {
+      // let sign = -(this.xVelocity / this.xVelocity)
+      // this.x += sign
+      // this.xVelocity = sign  
+    }
   }

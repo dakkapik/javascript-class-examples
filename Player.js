@@ -1,11 +1,11 @@
 class Player {
-  constructor (id) {
+  constructor (id, x, move) {
     this.sprites = {
       idle: loadImage('assets/char_idle.png'),
       // attack: loadImage('assets/char_attack.png')
     }
     this.id = id;
-    this.x = 150;
+    this.x = x;
     this.y = 0;
     this.xVelocity = 0;
     this.yVelocity = 0;
@@ -22,14 +22,26 @@ class Player {
       punch : new Attack(30,30,10),  
       kick: new Attack(30, 15, 10)
     }
-    
-    this.keys = {
-      left: 65,
-      right:68,
-      jump:32,
-      punch: 70,
-      kick: 82
+
+    // REMOVE THIS JUST FOR TESING
+    if(move){
+      this.keys = {
+        left: 65,
+        right:68,
+        jump:32,
+        punch: 70,
+        kick: 82
+      }
+    }else {
+      this.keys = {
+        left: 0,
+        right:0,
+        jump:0,
+        punch: 0,
+        kick: 0
+      }
     }
+    
   }
   
   update() {
@@ -56,6 +68,12 @@ class Player {
     }
   }
 
+  getRight(){
+    return this.x + this.width;
+  }
+  getDown() {
+    return this.y + this.height;
+  }
   
   updateXVelocity () {
     if(game.keyPressed.has(this.keys.right)) return this.topSpeed;
@@ -76,6 +94,13 @@ class Player {
     
     this.grounded = true;
     return -(this.yVelocity / 2);
+  }
+
+  collision () {
+    // console.log("collisiond")
+    // let sign = this.xVelocity / this.xVelocity
+    // this.x +=  -sign
+    this.xVelocity = -this.xVelocity
   }
   
   drawHitbox(){
