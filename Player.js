@@ -1,21 +1,23 @@
-class Player {
-  constructor (id, x, move) {
+class Player extends Entitie{
+  constructor (x, y, width, height) {
+    super();
     this.sprites = {
-      idle: loadImage('assets/char_idle.png'),
-      // attack: loadImage('assets/char_attack.png')
+      idle: 'assets/char_idle.png',
+      attack: 'assets/char_attack.png'
     }
-    this.id = id;
+    this.currentSprite = loadImage(this.sprites.idle)
     this.x = x;
-    this.y = 0;
-    this.xVelocity = 0;
-    this.yVelocity = 0;
-    this.grounded = false; 
-    this.width = 40;
-    this.height = 80;
-    this.topSpeed = 8;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+
+    this.runSpeed = 5;
     this.jumpHeight = 10;
+
+    this.grounded = false; 
     this.attacking = false;
-    
+    this.movement = true;
+
     this.color = "rgba(0,0,255,0.2)";
   
     this.attacks = {
@@ -23,100 +25,54 @@ class Player {
       kick: new Attack(30, 15, 10)
     }
 
-    // REMOVE THIS JUST FOR TESING
-    if(move){
-      this.keys = {
-        left: 65,
-        right:68,
-        jump:32,
-        punch: 70,
-        kick: 82
-      }
-    }else {
-      this.keys = {
-        left: 0,
-        right:0,
-        jump:0,
-        punch: 0,
-        kick: 0
-      }
+    this.keys = {
+      left: 65,
+      right:68,
+      jump:32,
+      punch: 70,
+      kick: 82
     }
-    
-  }
-  
-  update() {
-  
-    this.xVelocity = this.updateXVelocity()
-    this.yVelocity = this.updateYVelocity()
 
-    this.x = this.x + this.xVelocity;
-    this.y = this.y + this.yVelocity;
-    
-    this.drawHitbox();
-    this.draw();
-    
-    if(game.keyPressed.has(this.keys.punch)) {
-      this.attacking = true;
-      this.attacks.punch.draw(this.x + this.width, this.y);
-    } else {
-      this.attacking = false;
-    }
-    
-    
-    if(game.keyPressed.has(this.keys.kick)) {
-      this.attacks.kick.draw(this.x + this.width, this.y);
-    }
+    this.jobSet.push("draw")
+    this.jobSet.push("gravity")
+    this.jobSet.push("move")
   }
 
-  getRight(){
-    return this.x + this.width;
+  move () {
+    this.xVelocity = this.updateXVelocity();
+    this.yVelocity = this.updateYVelocity();
   }
-  getDown() {
-    return this.y + this.height;
+
+  updateYVelocity() {
+    if(game.keyPressed.has(this.keys.jump)) return this.jumpHeight
+    return this.yVelocity;
   }
-  
-  updateXVelocity () {
-    if(game.keyPressed.has(this.keys.right)) return this.topSpeed;
-    if(game.keyPressed.has(this.keys.left)) return -this.topSpeed;
+
+  updateXVelocity() {
+    if(game.keyPressed.has(this.keys.right)) return this.runSpeed;
+    if(game.keyPressed.has(this.keys.left)) return -this.runSpeed;
     return 0;
   }
-  
-  updateYVelocity () {
-    if(game.keyPressed.has(this.keys.jump) && this.grounded) {
-      this.grounded = false;
-      return -this.jumpHeight;
-    }
-    
-    if(this.y + this.height < game.floorY) {
-      this.grounded = false;
-      return this.yVelocity + game.gravity;
-    }
-    
-    this.grounded = true;
-    return -(this.yVelocity / 2);
+
+  setSprite(sprite) {
+    this.currentSprite = loadImage(sprite)
   }
 
-  collision () {
-    // console.log("collisiond")
-    // let sign = this.xVelocity / this.xVelocity
-    // this.x +=  -sign
-    this.xVelocity = -this.xVelocity
+  hideHitbox() {
+    this.jobSet = this.jobset.filter(e => e === "drawHitbox")
   }
-  
-  drawHitbox(){
-    fill(this.color);
-    rect(this.x, this.y, this.width, this.height);
+
+  showHitbox () {
+    this.jobSet.push("drawHitbox")
   }
 
   draw(){
-    //COMMENTED THIS TO ONLY USE ONE SPRITE
-    image(this.sprites.idle, this.x, this.y)
-    // if(this.attacking){
-    //   image(this.sprites.attack, this.x,this.y)
-    // }else {
-    //   image(this.sprites.idle, this.x,this.y)
-    // }
-    
+    image(this.currentSprite, this.x, this.y)
+  }
+
+  drawHitbox(){
+    fill(this.color);
+    rect(this.x, this.y, this.width, this.height);
   }
 }
 

@@ -1,13 +1,13 @@
-class Game {
+class Game extends Input {
   constructor () {
+    super();
     this.gameWidth = 400;
     this.gameHeight = 400;
-    this.floorY = 300;
-    this.gravity = 0.5;
+    this.gravity = 0.3;
     this.keyPressed = new Set();
-    this.entities = {};
-    this.eId = [];
+    this.entities = [];
     
+    //create method for key assigment
     document.addEventListener("keydown", (e) => {
       this.keyPressed.add(e.keyCode)
     })
@@ -17,50 +17,34 @@ class Game {
     })
   }
   
-  addEntity (x, y, width, height) {
-    let id = Date.now().toString();
-    this.eId.push(id)
-    this.entities[id] = new Box(x, y, width, height, id);
+  addBox (x, y, width, height) {
+    this.entities.push(new Box(x, y, width, height))
   }
   
-  addPlayer (x, move) {
-    let id = Date.now().toString();
-    this.eId.push(id)
-    this.entities[id] = new Player(id, x, move);
+  addPlayer (x, y, width, height) {
+    this.entities.push(new Player(x, y, width, height))
   }
   
   update() {
-    this.eId.forEach(id => {
-      // console.log(this.entities[id])
-      this.collision(id)
-      this.entities[id].update()
+    this.entities.forEach((entity, index) => {
+      entity.update()
+      this.collision(index)
     })
   }
   
-  collision (subjectId) {
-    for(let target = 0; target < this.eId.length; target++){
-      if(this.eId[target] !== subjectId) {
-        let targetId = this.eId[target]
-        if(
-          
-          this.entities[subjectId].x < this.entities[targetId].getRight() &&
-          this.entities[subjectId].getRight() > this.entities[targetId].x &&
-          this.entities[subjectId].y < this.entities[targetId].getDown() &&
-          this.entities[subjectId].getDown() > this.entities[targetId].y
-          
-          
-          ) {
-            this.entities[subjectId].collision()
-            this.entities[targetId].collision()
-          
-        }
+  collision (subject) {
+    for(let target = subject + 1; target < this.entities.length; target++){
+      if(
+        this.entities[subject].x < this.entities[target].getRight() &&
+        this.entities[subject].getRight() > this.entities[target].x &&
+        this.entities[subject].y < this.entities[target].getDown() &&
+        this.entities[subject].getDown() > this.entities[target].y
+        ) {
+          this.entities[subject].collisionWith(target)
+          this.entities[target].collisionWith(subject)
       }
     }
-  }
-  
-  drawFloor () {
-    fill('white')
-    rect(0, this.floorY, this.gameWidth, this.gameHeight - this.floorY)
+
   }
 }
 
