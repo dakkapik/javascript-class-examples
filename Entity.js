@@ -1,4 +1,4 @@
-class Entitie {
+class Entity {
     constructor () {
         this.id = Date.now().toString();
         this.x = 0;

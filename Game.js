@@ -1,21 +1,14 @@
 class Game extends Input {
   constructor () {
     super();
-    this.background = 220;
+    // this.background = loadImage("./assets/trees.jpg");
+    this.background = loadImage("./assets/buildings.png");
     this.gameWidth = 1200
     this.gameHeight = 400;
     this.gravity = 0.3;
+    this.crosshair = true;
     this.keyPressed = new Set();
     this.entities = [];
-    
-    //create method for key assigment
-    document.addEventListener("keydown", (e) => {
-      this.keyPressed.add(e.keyCode)
-    })
-    
-    document.addEventListener("keyup", (e) => {
-      this.keyPressed.delete(e.keyCode)
-    })
   }
   
   addBox (x, y, width, height) {
@@ -32,11 +25,14 @@ class Game extends Input {
       entity.update()
       this.collision(index)
     })
+    this.drawCrossHair()
   }
 
   drawBackground(){
     //better background
-    background(this.background);
+
+    // image(this.background, 0,0,this.gameWidth, this.gameHeight)
+    background(220);
   }
 
   

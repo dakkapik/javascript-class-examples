@@ -1,4 +1,4 @@
-class Player extends Entitie{
+class Player extends Entity{
   constructor (x, y, width, height, move) {
     super();
     this.sprites = {
@@ -12,7 +12,7 @@ class Player extends Entitie{
     this.height = height;
     this.metaTextSize = 20;
 
-    this.runDrag = 0.8;
+    this.runDrag = 0.9;
 
     this.runSpeed = 5;
     this.jumpHeight = 10;
@@ -226,7 +226,7 @@ class Player extends Entitie{
   }
 }
 
-class Attack extends Entitie {
+class Attack extends Entity {
   constructor(width, height, yOffSet = 0, xOffSet) {
     super();
     this.index;

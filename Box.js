@@ -1,4 +1,4 @@
-class Box extends Entitie {
+class Box extends Entity {
     constructor(x, y, width, height) {
       super();
       this.x = x;
