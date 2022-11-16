@@ -53,8 +53,10 @@ class Entitie {
     }
 
     collisionWith(entityIndex) {
-        game.entities[entityIndex].yVelocity *= -1
-        this.yVelocity *= -1
+        // game.entities[entityIndex].yVelocity *= -1
+        // this.yVelocity *= -1
+
+
         // if(game.entities[entityIndex].y > this.y){
         //     game.entities[entityIndex].yVelocity *= -1 
         // } else {

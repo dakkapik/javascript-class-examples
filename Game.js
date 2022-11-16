@@ -1,8 +1,8 @@
 class Game extends Input {
   constructor () {
     super();
-    this.gameWidth = 400;
-    this.gameHeight = 400;
+    this.gameWidth = 1000;
+    this.gameHeight = 800;
     this.gravity = 0.3;
     this.keyPressed = new Set();
     this.entities = [];
