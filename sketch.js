@@ -1,34 +1,24 @@
-let game = new Game();
-game.addEntity(0,300, 400, 50);
-// let player1
-// let player2
+let game;
 
 function setup() {
-  // player1 = new Player();
-  // player2 = new Player();
+  game = new Game();
   
-  game.addPlayer(100, true);
-  game.addPlayer(300, false);
-  
+  game.addBox(0,350, 1200,50);
+
+  game.addPlayer(100, 10, 40, 80);
+  game.addPlayer(300, 10, 40, 80);
+
+
+  // game.entities[1].showMetaData();
+  game.entities[1].showHitbox();
+
+  game.entities[2].disableMove();
+  // game.entities[2].showHitbox();
 
   frameRate(60);
   createCanvas(game.gameWidth, game.gameHeight);
-  
-  // player2.x = 300;
-
-  // player2.keys.left = 37;
-  // player2.keys.right = 39;
-  // player2.keys.jump = 17;
-  // player2.keys.punch = 16;
 }
 
 function draw() {
-  background(220);
-  
-  // game.drawFloor();
-  
   game.update();
-  
-  // player1.update();
-  // player2.update();
 }

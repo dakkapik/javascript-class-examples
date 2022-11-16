@@ -21,12 +21,24 @@ class Entitie {
         };
     }
 
+    removeJob(job){
+        this.jobSet.splice(this.jobSet.indexOf(job))
+    }
+
     updateXVelocity (vel) {
         this.xVelocity = vel;
     }
     
     updateYVelocity (vel) {
         this.yVelocity = vel
+    }
+
+    getUp() {
+        return this.y;
+    }
+
+    getLeft() {
+        return this.x;
     }
 
     getRight(){
@@ -53,9 +65,9 @@ class Entitie {
     }
 
     collisionWith(entityIndex) {
+        // console.log(game.entities[entityIndex].constructor.name)
         // game.entities[entityIndex].yVelocity *= -1
         // this.yVelocity *= -1
-
 
         // if(game.entities[entityIndex].y > this.y){
         //     game.entities[entityIndex].yVelocity *= -1 

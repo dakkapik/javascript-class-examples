@@ -17,4 +17,6 @@ class Box extends Entitie {
       fill(this.color);
       rect(this.x, this.y, this.width, this.height);
     }
+
+    collisionWith(){}
 }
