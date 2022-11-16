@@ -1,10 +1,11 @@
 class Player extends Entity{
-  constructor (x, y, width, height, move) {
+  constructor (x, y, width, height) {
     super();
     this.sprites = {
       idle: loadImage('assets/char_idle.png'),
       attack: loadImage('assets/char_attack.png')
     }
+    //timer class
     this.currentSprite = this.sprites.idle
     this.x = x;
     this.y = y;
@@ -12,23 +13,22 @@ class Player extends Entity{
     this.height = height;
     this.metaTextSize = 20;
 
-    this.runDrag = 0.9;
+    this.runDrag = 0.8;
+    this.runSpeed = 6;
 
-    this.runSpeed = 5;
     this.jumpHeight = 10;
     this.jumpCount = 0;
-    this.jumpCooldown = false;
-    this.jumpCooldownTime = 500;
+    this.jumpCooldownTime = 30;
+    this.jumpCooldownTimer = 0;
 
     this.faceRight = true;
 
-    this.grounded = false;
-
     this.attacking = false;
-    this.attackDuration = 500;
 
-    this.attackCooldownTime = 600;
-    this.attackCooldown = false;
+    this.attackTimer = 0;
+    this.attackDuration = 25; 
+    
+    this.attackCooldown = 30;
 
     this.movement = true;
 
@@ -60,7 +60,7 @@ class Player extends Entity{
         left: 65,
         right:68,
         jump:32,
-        punch: 70,
+        punch: 86,
         kick: 82
       }
     // this.jobSet.push("move")
@@ -80,43 +80,53 @@ class Player extends Entity{
   }
 
   selectAnimation() {
-    if(!this.attackCooldown && game.keyPressed.has(this.keys.punch)) {
+    if(this.attackTimer === 0 && game.keyPressed.has(this.keys.punch)) {
+
       this.attacking = true;
-      this.attackCooldown = true;
-
-      game.entities.push()
-      let index = game.entities.length - 1
-
-      setTimeout(()=>{
-
-        this.attacking = false;  
-        setTimeout(()=> this.attackCooldown = false, this.attackCooldownTime);
-
-      }, this.attackDuration)
+      this.attackTimer ++;
 
       return this.sprites.attack;
     }
+      // needs work 
+    if(this.attackTimer > 0 && this.attackTimer < this.attackCooldown + this.attackDuration){
+      this.attackTimer ++;
+      
+      if(this.attackTimer < this.attackDuration) {
+        return this.sprites.attack;
+      } else {
+        this.attacking = false;
+        return this.sprites.idle
+      }
+  
+    } else {
+      this.attackTimer = 0;
+    }
 
-    if(this.attacking) return this.sprites.attack
+    // if(this.attacking) return this.sprites.attack
+
     return this.sprites.idle;
   }
 
   updateYVelocity() {
     if(
-      !this.jumpCooldown &&
       game.keyPressed.has(this.keys.jump) &&
+      this.jumpCooldownTimer === 0 &&
       this.jumpCount < 2
     ) {
 
-      this.jumpCooldown = true
       this.jumpCount ++;
+      this.jumpCooldownTimer ++;
+      return -this.jumpHeight;
 
-      setTimeout(()=>{
-        this.jumpCooldown = false ;
-      }, this.jumpCooldownTime)
+    } else {
 
-      return -this.jumpHeight
-    } 
+      if(this.jumpCooldownTimer > 0 && this.jumpCooldownTimer < this.jumpCooldownTime) {
+        this.jumpCooldownTimer++
+      } else {
+        this.jumpCooldownTimer = 0;
+      }
+
+    }
     
     return this.yVelocity;
   }
@@ -162,10 +172,10 @@ class Player extends Entity{
     xVel:${this.xVelocity}
     yVel:${this.yVelocity}
     jumpCount: ${this.jumpCount}
-    jcoolDown: ${this.jumpCooldown}
+    jumpColdown: ${this.jumpCooldownTimer}
     faceRight: ${this.faceRight}
     attacking: ${this.attacking}
-    attackCooldown: ${this.attackCooldown}`
+    attackTimer: ${this.attackTimer}`
     , game.gameWidth - 150, this.metaTextSize)
   }
 

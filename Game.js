@@ -3,7 +3,7 @@ class Game extends Input {
     super();
     // this.background = loadImage("./assets/trees.jpg");
     this.background = loadImage("./assets/buildings.png");
-    this.gameWidth = 1200
+    this.gameWidth = 600
     this.gameHeight = 400;
     this.gravity = 0.3;
     this.crosshair = true;

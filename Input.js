@@ -5,6 +5,7 @@ class Input {
         //create method for key assigment
         document.addEventListener("keydown", (e) => {
             this.keyPressed.add(e.keyCode)
+            console.log(e.keyCode)
         })
         
         document.addEventListener("keyup", (e) => {
