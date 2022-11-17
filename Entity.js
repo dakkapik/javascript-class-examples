@@ -1,6 +1,6 @@
 class Entity {
     constructor () {
-        this.id = Date.now().toString();
+        this.id = this.genUniqueId();
         this.x = 0;
         this.y = 0;
         this.xVelocity = 0;
@@ -19,6 +19,23 @@ class Entity {
         for(let i = 0; i < this.jobSet.length; i++){
             this[this.jobSet[i]]()
         };
+    }   
+
+    genUniqueId() {
+        const dateStr = Date
+          .now()
+          .toString(36); // convert num to base 36 and stringify
+      
+        const randomStr = Math
+          .random()
+          .toString(36)
+          .substring(2, 8); // start at index 2 to skip decimal point
+      
+        return `${dateStr}-${randomStr}`;
+    }
+
+    addJob(job) {
+        this.jobSet.push(job)
     }
 
     removeJob(job){

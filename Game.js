@@ -8,26 +8,38 @@ class Game extends Input {
     this.gravity = 0.3;
     this.crosshair = true;
     this.keyPressed = new Set();
-    /// entities show be a hashmap for easier deletion
-    this.entities = [];
-    // entityArray should be where you use collision
+    this.entities = {};
     this.entityIds = [];
   }
-////////////////////////////////////
-   //make function to add entites to game
-/////////////////////////////////////
+
+  addEntity ( entity ) {
+    this.entities[entity.id] = entity;
+    this.entityIds.push(entity.id);
+  }
+
+  removeEntity ( id ) {
+
+    ///////////////////////
+    // find way to delete obj without crash
+    ////////////
+    // delete this.entities[id];
+
+    this.entityIds.splice(this.entityIds.indexOf(id), 1);
+  }
+
   addBox (x, y, width, height) {
-    this.entities.push(new Box(x, y, width, height))
+    this.addEntity(new Box(x, y, width, height))
   }
   
   addPlayer (x, y, width, height) {
-    this.entities.push(new Player(x, y, width, height))
+    this.addEntity(new Player(x, y, width, height))
   }
   
   update() {
+
     this.drawBackground();
-    this.entities.forEach((entity, index) => {
-      entity.update()
+    this.entityIds.forEach((id, index) => {
+      this.entities[id].update();
       this.collision(index)
     })
     this.drawCrossHair()
@@ -42,15 +54,20 @@ class Game extends Input {
 
   
   collision (subject) {
-    for(let target = subject + 1; target < this.entities.length; target++){
+    for(let target = subject + 1; target < this.entityIds.length; target++){
+       
+      let t = this.entityIds[target];
+      let s = this.entityIds[subject];
+
+      // console.log(this.entities[this.entityIds[target]])
       if(
-        this.entities[subject].getLeft() < this.entities[target].getRight() &&
-        this.entities[subject].getRight() > this.entities[target].getLeft() &&
-        this.entities[subject].getUp() < this.entities[target].getDown() &&
-        this.entities[subject].getDown() > this.entities[target].getUp()
+        this.entities[s].getLeft() < this.entities[t].getRight() &&
+        this.entities[s].getRight() > this.entities[t].getLeft() &&
+        this.entities[s].getUp() < this.entities[t].getDown() &&
+        this.entities[s].getDown() > this.entities[t].getUp()
         ) {
-          this.entities[subject].collisionWith(target)
-          this.entities[target].collisionWith(subject)
+          this.entities[s].collisionWith(t);
+          this.entities[t].collisionWith(s);
       }
     }
 

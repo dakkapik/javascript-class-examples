@@ -1,7 +1,6 @@
 class Projectile extends Entity {
-    constructor(x,y, id, user) {
+    constructor(x,y, user) {
         super();
-        this.id = id;
         this.user = user
         this.color = "yellow";
         //change to have transparency
@@ -25,12 +24,7 @@ class Projectile extends Entity {
         //destory better, stop updates on hit
         if(this.x > 0 && this.x < game.gameWidth && this.y > 0 && this.y < game.gameHeight ) return;
         console.log("wall collision");
-        this.destroy();
-    }
-
-    destroy () {
-        // change data structure, hash map countains all objects and a array contains all ids for collision testing
-        game.entities.splice(this.id, 1);
+        game.removeEntity(this.id);
     }
 
     update() {
@@ -54,12 +48,14 @@ class Projectile extends Entity {
     }
 
     collisionWith(entityIndex) {
-        if(entityIndex !== this.user) this.destroy();
+        if(entityIndex !== this.user) game.removeEntity(this.id)
     }
 }
 
 function mousePressed() {
-   
-    game.entities.push(new Projectile(game.entities[1].getXCenter(), game.entities[1].getYCenter(), game.entities.length, 1))
+
+    // console.log(game.entities[game.entityIds[0]])
+    const userId = game.entityIds[1]
+   game.addEntity(new Projectile(game.entities[userId].getXCenter(), game.entities[userId].getYCenter(), userId));
 
 }

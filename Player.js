@@ -65,12 +65,10 @@ class Player extends Entity{
         punch: 86,
         kick: 82
       }
-    // this.jobSet.push("move")
   }
 
   disableMove(){
     Object.keys(this.keys).forEach( key => this.keys[key] = null)
-    // this.removeJob("move")
   }
 
   move () {
@@ -82,6 +80,7 @@ class Player extends Entity{
   }
 
   selectAnimation() {
+
     if(this.attackTimer === 0 && game.keyPressed.has(this.keys.punch)) {
 
       this.attacking = true;
@@ -163,7 +162,7 @@ class Player extends Entity{
   }
 
   hideMetaData() {
-    this.removeJob("displayData");
+    this.removeJob("displayMetaData");
   }
 
   showMetaData() {
@@ -194,7 +193,7 @@ class Player extends Entity{
       image(this.currentSprite, - this.x - this.width, this.y)
       pop()
     }
-    this.attackLogic(this.showHitbox);
+    this.attackLogic();
   }
 
   collisionWith(entitieIndex) {
@@ -245,7 +244,6 @@ class Player extends Entity{
 class Attack extends Entity {
   constructor(width, height, yOffSet = 0, xOffSet) {
     super();
-    this.index;
     this.active = false;
     this.width = width;
     this.height = height;
@@ -264,19 +262,17 @@ class Attack extends Entity {
   }
 
   activate(){
-    game.entities.push(this);
-    this.index = game.entities.length;
     this.active = true;
-    return
+    game.addEntity(this);
   }
   
   deactivate(){
     if(this.active) {
-      game.entities.splice(this.index, 1);
+      game.removeEntity(this.id);
       this.active = false;
-      return;
+      return
     } 
-    return;
+    return
   }
 
   draw() {

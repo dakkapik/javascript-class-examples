@@ -9,12 +9,14 @@ function setup() {
     game.addPlayer(100, 10, 40, 80);
     game.addPlayer(300, 10, 40, 80);
 
-  
-    game.entities[1].showMetaData();
-    game.entities[1].showHitbox();
+    console.log(game.entities)
+    console.log(game.entityIds)
 
-    game.entities[2].disableMove();
-    game.entities[2].showHitbox();
+    // game.entities[game.entityIds[1]].showMetaData();
+    // game.entities[game.entityIds[1]].showHitbox();
+
+    // game.entities[game.entityIds[2]].disableMove();
+    // game.entities[game.entityIds[2]].showHitbox();
 
     frameRate(60);
     createCanvas(game.gameWidth, game.gameHeight);
