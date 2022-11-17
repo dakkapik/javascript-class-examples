@@ -2,13 +2,16 @@ class Game extends Input {
   constructor () {
     super();
     // this.background = loadImage("./assets/trees.jpg");
-    this.background = loadImage("./assets/buildings.png");
+    // this.background = loadImage("./assets/buildings.png");
     this.gameWidth = 600
     this.gameHeight = 400;
     this.gravity = 0.3;
     this.crosshair = true;
     this.keyPressed = new Set();
+    /// entities show be a hashmap for easier deletion
     this.entities = [];
+    // entityArray should be where you use collision
+    this.entityIds = [];
   }
 ////////////////////////////////////
    //make function to add entites to game

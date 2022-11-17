@@ -9,6 +9,8 @@ class Player extends Entity{
     this.currentSprite = this.sprites.idle
     this.x = x;
     this.y = y;
+    this.xCenterOffset = width / 2;
+    this.yCenterOffset = height / 2;
     this.width = width;
     this.height = height;
     this.metaTextSize = 20;
@@ -143,6 +145,10 @@ class Player extends Entity{
 
     return this.xVelocity * this.runDrag
   }
+
+  getXCenter() { return this.x + this.xCenterOffset }
+
+  getYCenter() { return this.y + this.yCenterOffset }
 
   setSprite(sprite) {
     this.currentSprite = loadImage(sprite)
