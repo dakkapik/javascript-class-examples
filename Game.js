@@ -10,7 +10,9 @@ class Game extends Input {
     this.keyPressed = new Set();
     this.entities = [];
   }
-  
+////////////////////////////////////
+   //make function to add entites to game
+/////////////////////////////////////
   addBox (x, y, width, height) {
     this.entities.push(new Box(x, y, width, height))
   }
