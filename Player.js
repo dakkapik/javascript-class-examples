@@ -13,14 +13,11 @@ class Player extends Entity{
     this.yCenterOffset = height / 2;
     this.width = width;
     this.height = height;
-
-    // drag must be decimal negative
-    this.runDrag = -0.8;
-    this.airDrag = -0.99;
+    this.mass = 200;
 
     this.runSpeed = 6;
 
-    this.jumpHeight = 8;
+    this.jumpHeight = 50;
     this.jumpCount = 0;
     this.jumpCooldownTime = 30;
     this.jumpCooldownTimer = 0;
@@ -56,7 +53,7 @@ class Player extends Entity{
     this.jobSet.push("updateMovement");
     this.jobSet.push("gravity");
     this.jobSet.push("calcAccel");
-    this.jobSet.push("animation")
+    this.jobSet.push("animation");
     this.jobSet.push("draw");
   }
 
@@ -71,15 +68,23 @@ class Player extends Entity{
       }
   }
 
+  setXDrag(drag) {this.xDrag = drag}
+  setYDrag(drag) {this.yDrag = drag}
+
   disableMove(){
     Object.keys(this.keys).forEach( key => this.keys[key] = null)
   }
 
   updateMovement () {
+    //player movement
     this.xForces.push(this.getXmove());
-    this.xForces.push(this.xVelocity * this.airDrag)
+    //resistance
+    this.xForces.push(this.xVelocity * this.xDrag);
+
+    //player movement
     this.yForces.push(this.getYmove());
-    this.yForces.push(this.yVelocity * this.airDrag)
+    //resistance
+    this.yForces.push(this.yVelocity * this.yDrag);
   }
   
   calcAccel() {
@@ -123,26 +128,20 @@ class Player extends Entity{
   }
 
   getYmove() {
-    if(
-      game.keyPressed.has(this.keys.jump) &&
-      this.jumpCooldownTimer === 0 &&
-      this.jumpCount < 2
-    ) {
-
-      this.jumpCount ++;
-      this.jumpCooldownTimer ++;
-      return -this.jumpHeight;
-
-    } else {
-
-      if(this.jumpCooldownTimer > 0 && this.jumpCooldownTimer < this.jumpCooldownTime) {
-        this.jumpCooldownTimer++
-      } else {
-        this.jumpCooldownTimer = 0;
+    if(game.keyPressed.has(this.keys.jump)) {
+      if(this.jumpCooldownTimer === 0 && this.jumpCount < 2) {
+        this.jumpCount ++;
+        this.jumpCooldownTimer ++;
+        return - this.jumpHeight;
       }
-
     }
-    
+
+    if(this.jumpCooldownTimer > 0 && this.jumpCooldownTimer < this.jumpCooldownTime) {
+        this.jumpCooldownTimer++
+    } else {
+        this.jumpCooldownTimer = 0;
+    }
+
     return 0;
   }
 
@@ -190,22 +189,35 @@ class Player extends Entity{
   collisionWith(entitieIndex) {
     switch(game.entities[entitieIndex].constructor.name){
       case "Box":
+        // drag needs to overwrite default drag before update
+        // don't know why it isn't doing that
+
+        this.setXDrag(game.runDrag);
+
         if(this.y < game.entities[entitieIndex].y && this.yVelocity > 0) {
           this.jumpCount = 0;
-          this.yForces.push(this.yVelocity * -1);
-          this.xForces.push(this.xVelocity * this.runDrag)
+
+          // force reflection, don't work
+          this.yForces.push((this.yVelocity + this.yAccel ) * -1 );
+
           /// THIS IS CHEATING DON'T COUNT
           this.y = game.entities[entitieIndex].y - this.height;
           return; 
         }
+      break;
       case "Attack" :
-        if(game.entities[entitieIndex].x < this.x){
-          // this.xVelocity = 5;
+        if(game.entities[entitieIndex].x < this.x && !game.entities[entitieIndex].isPlayer(this.id)){
+          // some fancy oop optimizations to avoid collision checks with body parts 
+
+          // SHOULD BE ACCELERATION
+          this.xVelocity = 5;
         } else {
-          // this.xVelocity = -5;
+          this.xVelocity = -5;
         }
+      break;
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
+      break; 
     }
     
 
@@ -234,13 +246,14 @@ class Player extends Entity{
 }
 
 class Attack extends Entity {
-  constructor(width, height, yOffSet = 0, xOffSet) {
+  constructor(width, height, yOffSet = 0, xOffSet, playerId) {
     super();
     this.active = false;
     this.width = width;
     this.height = height;
     this.yOffSet = yOffSet;
     this.xOffSet = xOffSet;
+    this.playerId = playerId;
 
     /*
       FEATURES to add
@@ -251,6 +264,10 @@ class Attack extends Entity {
       time
     */
     
+  }
+
+  isPlayer(id) {
+    return this.playerId === id; 
   }
 
   activate(){

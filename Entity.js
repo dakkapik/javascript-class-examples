@@ -4,6 +4,8 @@ class Entity {
         this.x = 0;
         this.y = 0;
         this.mass = 0;
+        this.xDrag = 0;
+        this.yDrag = 0;
         this.xForces = [];
         this.yForces = [];
         this.xVelocity = 0;
@@ -24,6 +26,8 @@ class Entity {
     }
 
     update() {
+        // drag after collision should update here, it's not
+        
         this.x = this.x + this.xVelocity;
         this.y = this.y + this.yVelocity;
         
@@ -31,6 +35,11 @@ class Entity {
             this[this.jobSet[i]]()
         };
     }   
+
+    resetModifiers () {
+        this.xDrag = game.airDrag;
+        this.yDrag = game.airDrag;
+    }
 
     genUniqueId() {
         const dateStr = Date
@@ -111,7 +120,7 @@ class Entity {
     }
 
     gravity() {
-        this.yForces.push(game.gravity)
+        this.yForces.push(game.gravity * this.mass)
     }
 
     hideMetaData() {
@@ -140,7 +149,7 @@ class Entity {
     applyMetaDefaults (form) {
         //save on session or something like that, cache?? maybe, different problem for different man
         this.metaDefaults.forEach(key => {
-            
+
             form[key].checked = true;
             this.metaDisplayList.push(key)
         })

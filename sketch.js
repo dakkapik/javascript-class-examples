@@ -1,7 +1,8 @@
 let game;
 
 let dataTestDefaults = [
-  'x','y', 'xForces', 'yForces', 'xVelocity', 'yVelocity', 'xAccel', 'yAccel', 'jumpCooldownTimer', 'jumpCount'
+  'x','y', 'xDrag', 'yDrag','xForces', 'yForces', 
+  // 'xVelocity', 'yVelocity', 'xAccel', 'yAccel', 'jumpCooldownTimer', 'jumpCount'
 ]
 
 function setup() {
