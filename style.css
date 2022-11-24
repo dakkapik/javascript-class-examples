@@ -1,8 +1,19 @@
 html, body {
-    margin: 0;
-    padding: 0;
-  }
-  canvas {
-    display: block;
-  }
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
   
+.metaSidebar {
+  font-size: 10px;;
+  width: 150px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background-color: aliceblue;
+  overflow-y: scroll;
+}

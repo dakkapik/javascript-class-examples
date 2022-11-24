@@ -3,13 +3,24 @@ class Entity {
         this.id = this.genUniqueId();
         this.x = 0;
         this.y = 0;
+        this.mass = 0;
+        this.xForces = [];
+        this.yForces = [];
         this.xVelocity = 0;
         this.yVelocity = 0;
+        this.xAccel = 0;
+        this.yAccel = 0;
         this.width = 0;
         this.height = 0;
         this.color = "blue";
         this.jobSet = [];
         this.anchored = true;
+
+        this.metaTextSize = 10;
+        this.metaTextColor = 'black';
+        this.metaDisplayList = [];
+        this.metaDisplayDefault = new Set();
+        this.metaDefaults = [];
     }
 
     update() {
@@ -42,12 +53,27 @@ class Entity {
         this.jobSet.splice(this.jobSet.indexOf(job))
     }
 
-    updateXVelocity (vel) {
-        this.xVelocity = vel;
+    calcXAccel () {
+        let result = 0;
+        this.xForces.forEach(force => result += force);
+        this.xAccel = result;
+    }
+
+    calcYAccel () {
+        let result = 0;
+        this.yForces.forEach(force => result += force);
+        this.yAccel = result;
+    }
+
+    updateXVelocity () {
+        this.xVelocity += this.xAccel;
+        this.xForces = [];
+
     }
     
-    updateYVelocity (vel) {
-        this.yVelocity = vel
+    updateYVelocity () {
+        this.yVelocity += this.yAccel;
+        this.yForces = [];
     }
 
     getUp() {
@@ -82,23 +108,97 @@ class Entity {
     }
 
     collisionWith(entityIndex) {
-        // console.log(game.entities[entityIndex].constructor.name)
-        // game.entities[entityIndex].yVelocity *= -1
-        // this.yVelocity *= -1
-
-        // if(game.entities[entityIndex].y > this.y){
-        //     game.entities[entityIndex].yVelocity *= -1 
-        // } else {
-
-        // }
-
-        // if(!this.anchored){
-        //     // this.xVelocity += (this.xVelocity - game.entities[entityIndex].xVelocity) * -1
-        //     this.yVelocity += (this.yVelocity - game.entities[entityIndex].yVelocity) * -1
-        // }
     }
 
     gravity() {
-        this.yVelocity += game.gravity;
+        this.yForces.push(game.gravity)
+    }
+
+    hideMetaData() {
+        this.removeJob("displayMetaData");
+    }
+        
+    showMetaData( defaults ) {
+
+        if(defaults) defaults.forEach(setting => this.metaDefaults.push(setting))
+
+        textSize(this.metaTextSize);
+        this.jobSet.splice(this.jobSet.indexOf('calcAccel'), 0, 'displayMetaData')
+
+        const metaSidebar = document.createElement("div")
+        metaSidebar.className = "metaSidebar"
+
+        //not good, but i'll just keep it for now, there is a better way to do this
+        let form = this.createMetaElementList()
+        form = this.applyMetaDefaults(form)
+
+        metaSidebar.appendChild(form)
+
+        document.body.appendChild(metaSidebar)
+    }
+
+    applyMetaDefaults (form) {
+        //save on session or something like that, cache?? maybe, different problem for different man
+        this.metaDefaults.forEach(key => {
+            
+            form[key].checked = true;
+            this.metaDisplayList.push(key)
+        })
+        return form; 
+    }
+
+    createMetaElementList () {
+        const form = document.createElement("form");
+        form.id = this.id;
+
+        form.addEventListener("change", (e) => {
+            if(document.getElementById(this.id)[e.target.id].checked) {
+                this.metaDisplayList.push(e.target.id)
+            } else {    
+                this.metaDisplayList.splice(this.metaDisplayList.indexOf(e.target.id))
+            }
+        })
+
+        Object.keys(this).forEach(property => {
+            const input = document.createElement("input");
+            const label = document.createElement("label");
+            const br = document.createElement("br");
+
+            input.type = "checkbox";
+            input.id = property;
+            input.name = property;
+            input.value = property;
+
+            label.for = property;
+            label.innerHTML = property;
+
+            form.appendChild(input);
+            form.appendChild(label);
+            form.appendChild(br);
+        })
+        return form;
+    }
+
+
+    displayMetaData() {
+        let displayString = ''
+
+        this.metaDisplayList.forEach(key => {
+            if(typeof(this[key]) !== 'object') {
+                displayString += `${key}: ${this[key]}`
+            } else {
+                displayString += this.formatMetaArrayToString(this[key], key)
+            }
+            displayString += '\n'
+        })
+
+        push();
+        fill(this.metaTextColor);
+        text(displayString, game.gameWidth - 150, this.metaTextSize);
+        pop();
+    }
+
+    formatMetaArrayToString(array, name) {
+        return `${name}: \n > ${JSON.stringify(array).replace(/,/g, '\n > ').replace(/{*}*\[*\]*/g, '')}`
     }
 }

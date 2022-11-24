@@ -1,5 +1,9 @@
 let game;
 
+let dataTestDefaults = [
+  'x','y', 'xForces', 'yForces', 'xVelocity', 'yVelocity', 'xAccel', 'yAccel', 'jumpCooldownTimer', 'jumpCount'
+]
+
 function setup() {
   frameRate(60);
 
@@ -13,7 +17,7 @@ function setup() {
   console.log(game.entities);
   console.log(game.entities[game.entityIds[1]]);
 
-  game.entities[game.entityIds[1]].showMetaData();
+  game.entities[game.entityIds[1]].showMetaData(dataTestDefaults);
   game.entities[game.entityIds[1]].showHitbox();
 
   game.entities[game.entityIds[2]].disableMove();

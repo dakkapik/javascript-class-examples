@@ -13,12 +13,14 @@ class Player extends Entity{
     this.yCenterOffset = height / 2;
     this.width = width;
     this.height = height;
-    this.metaTextSize = 20;
 
-    this.runDrag = 0.8;
+    // drag must be decimal negative
+    this.runDrag = -0.8;
+    this.airDrag = -0.99;
+
     this.runSpeed = 6;
 
-    this.jumpHeight = 10;
+    this.jumpHeight = 8;
     this.jumpCount = 0;
     this.jumpCooldownTime = 30;
     this.jumpCooldownTimer = 0;
@@ -51,9 +53,11 @@ class Player extends Entity{
       kick: 82
     }
 
-    this.jobSet.push("draw")
-    this.jobSet.push("gravity")
-    this.jobSet.push("move")
+    this.jobSet.push("updateMovement");
+    this.jobSet.push("gravity");
+    this.jobSet.push("calcAccel");
+    this.jobSet.push("animation")
+    this.jobSet.push("draw");
   }
 
   enableMove(settings){
@@ -71,12 +75,22 @@ class Player extends Entity{
     Object.keys(this.keys).forEach( key => this.keys[key] = null)
   }
 
-  move () {
+  updateMovement () {
+    this.xForces.push(this.getXmove());
+    this.xForces.push(this.xVelocity * this.airDrag)
+    this.yForces.push(this.getYmove());
+    this.yForces.push(this.yVelocity * this.airDrag)
+  }
+  
+  calcAccel() {
+    this.calcXAccel();
+    this.calcYAccel();
+    this.updateXVelocity();
+    this.updateYVelocity();
+  }
 
-    this.xVelocity = this.updateXVelocity();
-    this.yVelocity = this.updateYVelocity();
+  animation() {
     this.currentSprite = this.selectAnimation();
-
   }
 
   selectAnimation() {
@@ -108,7 +122,7 @@ class Player extends Entity{
     return this.sprites.idle;
   }
 
-  updateYVelocity() {
+  getYmove() {
     if(
       game.keyPressed.has(this.keys.jump) &&
       this.jumpCooldownTimer === 0 &&
@@ -129,10 +143,10 @@ class Player extends Entity{
 
     }
     
-    return this.yVelocity;
+    return 0;
   }
 
-  updateXVelocity() {
+  getXmove() {
     if(game.keyPressed.has(this.keys.right)){
       this.faceRight = true;
       return this.runSpeed;
@@ -142,7 +156,7 @@ class Player extends Entity{
       return -this.runSpeed;
     }
 
-    return this.xVelocity * this.runDrag
+    return 0
   }
 
   getXCenter() { return this.x + this.xCenterOffset }
@@ -159,29 +173,6 @@ class Player extends Entity{
 
   showHitbox () {
     this.jobSet.push("drawHitbox");
-  }
-
-  hideMetaData() {
-    this.removeJob("displayMetaData");
-  }
-
-  showMetaData() {
-    textSize(this.metaTextSize);
-    this.jobSet.push("displayMetaData")
-  }
-
-  displayMetaData() {
-    text(`
-    x: ${this.x}
-    y:${this.y}
-    xVel:${this.xVelocity}
-    yVel:${this.yVelocity}
-    jumpCount: ${this.jumpCount}
-    jumpColdown: ${this.jumpCooldownTimer}
-    faceRight: ${this.faceRight}
-    attacking: ${this.attacking}
-    attackTimer: ${this.attackTimer}`
-    , game.gameWidth - 150, this.metaTextSize)
   }
 
   draw(){
@@ -201,17 +192,18 @@ class Player extends Entity{
       case "Box":
         if(this.y < game.entities[entitieIndex].y && this.yVelocity > 0) {
           this.jumpCount = 0;
-          this.yVelocity = 0;
+          this.yForces.push(this.yVelocity * -1);
+          this.xForces.push(this.xVelocity * this.runDrag)
+          /// THIS IS CHEATING DON'T COUNT
           this.y = game.entities[entitieIndex].y - this.height;
           return; 
         }
       case "Attack" :
         if(game.entities[entitieIndex].x < this.x){
-          this.xVelocity = 5;
+          // this.xVelocity = 5;
         } else {
-          this.xVelocity = -5;
+          // this.xVelocity = -5;
         }
-        // setTimeout(()=> this.xVelocity = 0, 50)
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
     }
