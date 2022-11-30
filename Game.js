@@ -5,7 +5,12 @@ class Game extends Input {
     // this.background = loadImage("./assets/buildings.png");
     this.gameWidth = 600
     this.gameHeight = 400;
-    this.gravity = 0.3;
+    this.gravity = 0.02;
+
+    // drag must be decimal negative
+    this.runDrag = -0.5;
+    this.airDrag = -0.4;
+
     this.crosshair = true;
     this.keyPressed = new Set();
     this.entities = {};
@@ -21,6 +26,7 @@ class Game extends Input {
 
     ///////////////////////
     // find way to delete obj without crash
+    // this makes game crash on collision detection, some garbage collector?
     ////////////
     // delete this.entities[id];
 
@@ -39,10 +45,11 @@ class Game extends Input {
 
     this.drawBackground();
     this.entityIds.forEach((id, index) => {
+      this.collision(index);
       this.entities[id].update();
-      this.collision(index)
+      this.entities[id].resetModifiers();
     })
-    this.drawCrossHair()
+    this.drawCrossHair();
   }
 
   drawBackground(){
@@ -60,14 +67,19 @@ class Game extends Input {
       let s = this.entityIds[subject];
 
       // console.log(this.entities[this.entityIds[target]])
-      if(
-        this.entities[s].getLeft() < this.entities[t].getRight() &&
-        this.entities[s].getRight() > this.entities[t].getLeft() &&
-        this.entities[s].getUp() < this.entities[t].getDown() &&
-        this.entities[s].getDown() > this.entities[t].getUp()
-        ) {
-          this.entities[s].collisionWith(t);
-          this.entities[t].collisionWith(s);
+      try{
+        if(
+          this.entities[s].getLeft() < this.entities[t].getRight() &&
+          this.entities[s].getRight() > this.entities[t].getLeft() &&
+          this.entities[s].getUp() < this.entities[t].getDown() &&
+          this.entities[s].getDown() > this.entities[t].getUp()
+          ) {
+            this.entities[s].collisionWith(t);
+            this.entities[t].collisionWith(s);
+        }
+      } catch (err) {
+        console.log(this.entities[s])
+        console.log(this.entities[t])
       }
     }
 

@@ -13,12 +13,11 @@ class Player extends Entity{
     this.yCenterOffset = height / 2;
     this.width = width;
     this.height = height;
-    this.metaTextSize = 20;
+    this.mass = 200;
 
-    this.runDrag = 0.8;
     this.runSpeed = 6;
 
-    this.jumpHeight = 10;
+    this.jumpHeight = 50;
     this.jumpCount = 0;
     this.jumpCooldownTime = 30;
     this.jumpCooldownTimer = 0;
@@ -51,9 +50,11 @@ class Player extends Entity{
       kick: 82
     }
 
-    this.jobSet.push("draw")
-    this.jobSet.push("gravity")
-    this.jobSet.push("move")
+    this.jobSet.push("updateMovement");
+    this.jobSet.push("gravity");
+    this.jobSet.push("calcAccel");
+    this.jobSet.push("animation");
+    this.jobSet.push("draw");
   }
 
   enableMove(settings){
@@ -67,16 +68,34 @@ class Player extends Entity{
       }
   }
 
+  setXDrag(drag) {this.xDrag = drag}
+  setYDrag(drag) {this.yDrag = drag}
+
   disableMove(){
     Object.keys(this.keys).forEach( key => this.keys[key] = null)
   }
 
-  move () {
+  updateMovement () {
+    //player movement
+    this.xForces.push(this.getXmove());
+    //resistance
+    this.xForces.push(this.xVelocity * this.xDrag);
 
-    this.xVelocity = this.updateXVelocity();
-    this.yVelocity = this.updateYVelocity();
+    //player movement
+    this.yForces.push(this.getYmove());
+    //resistance
+    this.yForces.push(this.yVelocity * this.yDrag);
+  }
+  
+  calcAccel() {
+    this.calcXAccel();
+    this.calcYAccel();
+    this.updateXVelocity();
+    this.updateYVelocity();
+  }
+
+  animation() {
     this.currentSprite = this.selectAnimation();
-
   }
 
   selectAnimation() {
@@ -108,31 +127,25 @@ class Player extends Entity{
     return this.sprites.idle;
   }
 
-  updateYVelocity() {
-    if(
-      game.keyPressed.has(this.keys.jump) &&
-      this.jumpCooldownTimer === 0 &&
-      this.jumpCount < 2
-    ) {
-
-      this.jumpCount ++;
-      this.jumpCooldownTimer ++;
-      return -this.jumpHeight;
-
-    } else {
-
-      if(this.jumpCooldownTimer > 0 && this.jumpCooldownTimer < this.jumpCooldownTime) {
-        this.jumpCooldownTimer++
-      } else {
-        this.jumpCooldownTimer = 0;
+  getYmove() {
+    if(game.keyPressed.has(this.keys.jump)) {
+      if(this.jumpCooldownTimer === 0 && this.jumpCount < 2) {
+        this.jumpCount ++;
+        this.jumpCooldownTimer ++;
+        return - this.jumpHeight;
       }
-
     }
-    
-    return this.yVelocity;
+
+    if(this.jumpCooldownTimer > 0 && this.jumpCooldownTimer < this.jumpCooldownTime) {
+        this.jumpCooldownTimer++
+    } else {
+        this.jumpCooldownTimer = 0;
+    }
+
+    return 0;
   }
 
-  updateXVelocity() {
+  getXmove() {
     if(game.keyPressed.has(this.keys.right)){
       this.faceRight = true;
       return this.runSpeed;
@@ -142,7 +155,7 @@ class Player extends Entity{
       return -this.runSpeed;
     }
 
-    return this.xVelocity * this.runDrag
+    return 0
   }
 
   getXCenter() { return this.x + this.xCenterOffset }
@@ -161,29 +174,6 @@ class Player extends Entity{
     this.jobSet.push("drawHitbox");
   }
 
-  hideMetaData() {
-    this.removeJob("displayMetaData");
-  }
-
-  showMetaData() {
-    textSize(this.metaTextSize);
-    this.jobSet.push("displayMetaData")
-  }
-
-  displayMetaData() {
-    text(`
-    x: ${this.x}
-    y:${this.y}
-    xVel:${this.xVelocity}
-    yVel:${this.yVelocity}
-    jumpCount: ${this.jumpCount}
-    jumpColdown: ${this.jumpCooldownTimer}
-    faceRight: ${this.faceRight}
-    attacking: ${this.attacking}
-    attackTimer: ${this.attackTimer}`
-    , game.gameWidth - 150, this.metaTextSize)
-  }
-
   draw(){
     if(this.faceRight){
       image(this.currentSprite, this.x, this.y)
@@ -199,21 +189,35 @@ class Player extends Entity{
   collisionWith(entitieIndex) {
     switch(game.entities[entitieIndex].constructor.name){
       case "Box":
+        // drag needs to overwrite default drag before update
+        // don't know why it isn't doing that
+
+        this.setXDrag(game.runDrag);
+
         if(this.y < game.entities[entitieIndex].y && this.yVelocity > 0) {
           this.jumpCount = 0;
-          this.yVelocity = 0;
+
+          // force reflection, don't work
+          this.yForces.push((this.yVelocity + this.yAccel ) * -1 );
+
+          /// THIS IS CHEATING DON'T COUNT
           this.y = game.entities[entitieIndex].y - this.height;
           return; 
         }
+      break;
       case "Attack" :
-        if(game.entities[entitieIndex].x < this.x){
+        if(game.entities[entitieIndex].x < this.x && !game.entities[entitieIndex].isPlayer(this.id)){
+          // some fancy oop optimizations to avoid collision checks with body parts 
+
+          // SHOULD BE ACCELERATION
           this.xVelocity = 5;
         } else {
           this.xVelocity = -5;
         }
-        // setTimeout(()=> this.xVelocity = 0, 50)
+      break;
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
+      break; 
     }
     
 
@@ -242,13 +246,14 @@ class Player extends Entity{
 }
 
 class Attack extends Entity {
-  constructor(width, height, yOffSet = 0, xOffSet) {
+  constructor(width, height, yOffSet = 0, xOffSet, playerId) {
     super();
     this.active = false;
     this.width = width;
     this.height = height;
     this.yOffSet = yOffSet;
     this.xOffSet = xOffSet;
+    this.playerId = playerId;
 
     /*
       FEATURES to add
@@ -259,6 +264,10 @@ class Attack extends Entity {
       time
     */
     
+  }
+
+  isPlayer(id) {
+    return this.playerId === id; 
   }
 
   activate(){
