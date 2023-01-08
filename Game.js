@@ -22,9 +22,10 @@ class Game extends Input {
     ///////////////////////
     // find way to delete obj without crash
     ////////////
-    // delete this.entities[id];
-
+    
     this.entityIds.splice(this.entityIds.indexOf(id), 1);
+    console.log(this.entityIds.length)
+    delete this.entities[id];
   }
 
   addBox (x, y, width, height) {

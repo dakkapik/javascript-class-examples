@@ -5,19 +5,22 @@ function setup() {
 
   game = new Game();
   
-  game.addBox(0,350, 900,50);
-
   game.addPlayer(100, 10, 40, 80);
   game.addPlayer(300, 10, 40, 80);
 
-  console.log(game.entities);
-  console.log(game.entities[game.entityIds[1]]);
+  game.addBox(0,350, 900,50);
+  game.addBox(0, 0, 10,350);
+  game.addBox(590, 0, 10, 350);
 
-  game.entities[game.entityIds[1]].showMetaData();
+  // console.log(game.entities);
+  // console.log(game.entities[game.entityIds[1]]);
+
+  // game.entities[game.entityIds[0]].showMetaData();
+  game.entities[game.entityIds[0]].showHitbox();
   game.entities[game.entityIds[1]].showHitbox();
+  // game.entities[game.entityIds[1]].showHitbox();
 
-  game.entities[game.entityIds[2]].disableMove();
-  // game.entities[game.entityIds[2]].showHitbox();
+  game.entities[game.entityIds[1]].disableMove();
 
   
   createCanvas(game.gameWidth, game.gameHeight);

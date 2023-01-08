@@ -55,7 +55,7 @@ class Projectile extends Entity {
 function mousePressed() {
 
     // console.log(game.entities[game.entityIds[0]])
-    const userId = game.entityIds[1]
+    const userId = game.entityIds[0]
    game.addEntity(new Projectile(game.entities[userId].getXCenter(), game.entities[userId].getYCenter(), userId));
 
 }

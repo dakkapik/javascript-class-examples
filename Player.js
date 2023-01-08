@@ -2,13 +2,13 @@ class Player extends Entity{
   constructor (x, y, width, height) {
     super();
     this.sprites = {
-      idle: loadImage('assets/char_idle.png'),
-      attack: loadImage('assets/char_attack.png')
+      idle: loadImage('assets/char_idle.png')
     }
     //timer class
     this.currentSprite = this.sprites.idle
     this.x = x;
     this.y = y;
+    this.health = 100;
     this.xCenterOffset = width / 2;
     this.yCenterOffset = height / 2;
     this.width = width;
@@ -29,6 +29,8 @@ class Player extends Entity{
 
     this.attackTimer = 0;
     this.attackDuration = 25; 
+
+    this.currentAttack;
     
     this.attackCooldown = 30;
 
@@ -36,20 +38,20 @@ class Player extends Entity{
 
     this.color = "rgba(0,0,255,0.2)";
   
-    this.attacks = {
-      punch : new Attack(30,30,10),  
-      kick: new Attack(30, 15, 10)
-    }
+    this.attacks = {}
+    this.attackNames = null;
 
     this.attackEntitiIndex = null;
 
     this.keys = {
       left: 65,
       right:68,
-      jump:32,
-      punch: 70,
-      kick: 82
+      jump:32
     }
+
+    this.addAttack(30,30,'punch','assets/char_attack.png', 70,25,30, 10, 10,10);
+    this.addAttack(80,15, 'kick', 'assets/char_attack.png',82,30,30, 40, 20, 10);
+    this.addAttack(25,15, 'grab', 'assets/char_attack.png',69,30, -10, 15, 25, 10);
 
     this.jobSet.push("draw")
     this.jobSet.push("gravity")
@@ -79,21 +81,48 @@ class Player extends Entity{
 
   }
 
+  addAttack (
+    w, h, name, spritePath, 
+    keyCode, attackDuration, 
+    attackCooldown, knockback, 
+    damage, yoffset, xoffset)
+    {
+
+    this.sprites[name] = loadImage(spritePath)
+
+    this.attacks[name] = new Attack(
+      w, h, attackDuration, 
+      attackCooldown, knockback, 
+      damage, yoffset, xoffset
+    );
+
+    this.keys[name] = keyCode;
+    this.attackNames = Object.keys(this.attacks);
+  }
+
   selectAnimation() {
+    if(this.attackTimer === 0) {
+      this.attackNames.forEach(name => {
+        if(game.keyPressed.has(this.keys[name])){
+          this.currentAttack = name;
 
-    if(this.attackTimer === 0 && game.keyPressed.has(this.keys.punch)) {
+          this.attacking = true;
+          this.attackTimer ++;
+          this.attackDuration = this.attacks[name].duration;
+          this.attackCooldown = this.attacks[name].cooldown;
 
-      this.attacking = true;
-      this.attackTimer ++;
-
-      return this.sprites.attack;
+          return this.sprites[this.currentAttack];
+        }
+      })
     }
+
+
       // needs work 
     if(this.attackTimer > 0 && this.attackTimer < this.attackCooldown + this.attackDuration){
       this.attackTimer ++;
       
       if(this.attackTimer < this.attackDuration) {
-        return this.sprites.attack;
+        return this.sprites[this.currentAttack]
       } else {
         this.attacking = false;
         return this.sprites.idle
@@ -171,6 +200,8 @@ class Player extends Entity{
   }
 
   displayMetaData() {
+    push();
+    fill("blue")
     text(`
     x: ${this.x}
     y:${this.y}
@@ -181,7 +212,8 @@ class Player extends Entity{
     faceRight: ${this.faceRight}
     attacking: ${this.attacking}
     attackTimer: ${this.attackTimer}`
-    , game.gameWidth - 150, this.metaTextSize)
+    , game.gameWidth - 150, this.metaTextSize);
+    pop();
   }
 
   draw(){
@@ -203,17 +235,31 @@ class Player extends Entity{
           this.jumpCount = 0;
           this.yVelocity = 0;
           this.y = game.entities[entitieIndex].y - this.height;
+          // this.xVelocity = game.entities[entitieIndex].xVelocity * -1;
           return; 
         }
-      case "Attack" :
+
         if(game.entities[entitieIndex].x < this.x){
           this.xVelocity = 5;
         } else {
           this.xVelocity = -5;
         }
+        break;
+
+      case "Attack" :
+
+        let attack = game.entities[entitieIndex]  
+
+        if(game.entities[entitieIndex].x < this.x){
+          this.xVelocity = attack.knockback;
+        } else {
+          this.xVelocity = - attack.knockback;
+        }
+        break;
         // setTimeout(()=> this.xVelocity = 0, 50)
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
+      break;
     }
     
 
@@ -223,27 +269,38 @@ class Player extends Entity{
     fill(this.color);
     rect(this.x, this.y, this.width, this.height);
     if(this.attacking){
-      this.attacks.punch.draw();
+      this.attacks[this.currentAttack].draw();
     }
   }
 
   attackLogic(){
     if(this.attacking){
-      this.attacks.punch.activate();
+      if(!this.attacks[this.currentAttack].active){
+        this.attacks[this.currentAttack].activate();
+      }
+
       if(this.faceRight) {
-        this.attacks.punch.update(this.x, this.y, this.width)
+        this.attacks[this.currentAttack].update(this.x, this.y, this.width)
       } else {
-        this.attacks.punch.update(this.x, this.y, this.attacks.punch.width*-1)
+        this.attacks[this.currentAttack].update(this.x, this.y, this.attacks[this.currentAttack].width*-1)
       }
       return 
     }
-    this.attacks.punch.deactivate();
+    if(this.currentAttack != null) this.attacks[this.currentAttack].deactivate();
   }
 }
 
 class Attack extends Entity {
-  constructor(width, height, yOffSet = 0, xOffSet) {
+  constructor(
+    width, height, duration, 
+    cooldown, knockback, damage, 
+    yOffSet = 0, xOffSet=0) {
+
     super();
+    this.duration = duration;
+    this.cooldown = cooldown;
+    this.knockback = knockback;
+    this.damage = damage;
     this.active = false;
     this.width = width;
     this.height = height;
