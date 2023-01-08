@@ -49,9 +49,9 @@ class Player extends Entity{
       jump:32
     }
 
-    this.addAttack(30,30,'punch','assets/char_attack.png', 70,25,30, 10, 10,10);
-    this.addAttack(80,15, 'kick', 'assets/char_attack.png',82,30,30, 40, 20, 10);
-    this.addAttack(25,15, 'grab', 'assets/char_attack.png',69,30, -10, 15, 25, 10);
+    this.addAttack(30, 30, 70, 'punch','assets/char_attack.png', 10,  5,  1, 10, 10);
+    this.addAttack(40, 20, 82, 'kick', 'assets/char_attack.png', 30, 30, 20, 20, 30);
+    this.addAttack(15, 25, 69, 'grab', 'assets/char_attack.png', 30, 10, -1, 25, 15);
 
     this.jobSet.push("draw")
     this.jobSet.push("gravity")
@@ -82,19 +82,18 @@ class Player extends Entity{
   }
 
   addAttack (
-    w, h, name, spritePath, 
-    keyCode, attackDuration, 
-    attackCooldown, knockback, 
-    damage, yoffset, xoffset)
+    w, h, keyCode, name, spritePath, 
+    duration, cooldown, knockback, damage, 
+    yoffset, xoffset)
     {
 
-    this.sprites[name] = loadImage(spritePath)
+    this.sprites[name] = loadImage(spritePath);
 
     this.attacks[name] = new Attack(
-      w, h, attackDuration, 
-      attackCooldown, knockback, 
+      w, h, duration, 
+      cooldown, knockback, 
       damage, yoffset, xoffset
-    );
+      );
 
     this.keys[name] = keyCode;
     this.attackNames = Object.keys(this.attacks);
@@ -105,7 +104,7 @@ class Player extends Entity{
       this.attackNames.forEach(name => {
         if(game.keyPressed.has(this.keys[name])){
           this.currentAttack = name;
-
+          
           this.attacking = true;
           this.attackTimer ++;
           this.attackDuration = this.attacks[name].duration;
@@ -131,8 +130,6 @@ class Player extends Entity{
     } else {
       this.attackTimer = 0;
     }
-
-    // if(this.attacking) return this.sprites.attack
 
     return this.sprites.idle;
   }
@@ -253,7 +250,7 @@ class Player extends Entity{
         if(game.entities[entitieIndex].x < this.x){
           this.xVelocity = attack.knockback;
         } else {
-          this.xVelocity = - attack.knockback;
+          this.xVelocity = -attack.knockback;
         }
         break;
         // setTimeout(()=> this.xVelocity = 0, 50)
@@ -286,7 +283,10 @@ class Player extends Entity{
       }
       return 
     }
-    if(this.currentAttack != null) this.attacks[this.currentAttack].deactivate();
+
+    if(this.currentAttack != null) {
+      this.attacks[this.currentAttack].deactivate();
+    }
   }
 }
 
