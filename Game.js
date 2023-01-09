@@ -3,13 +3,14 @@ class Game extends Input {
     super();
     // this.background = loadImage("./assets/trees.jpg");
     // this.background = loadImage("./assets/buildings.png");
-    this.gameWidth = 600
+    this.gameWidth = 600;
     this.gameHeight = 400;
     this.gravity = 0.3;
     this.crosshair = true;
     this.keyPressed = new Set();
     this.entities = {};
     this.entityIds = [];
+    this.playerIds = [];
   }
 
   addEntity ( entity ) {
@@ -18,13 +19,7 @@ class Game extends Input {
   }
 
   removeEntity ( id ) {
-
-    ///////////////////////
-    // find way to delete obj without crash
-    ////////////
-    
     this.entityIds.splice(this.entityIds.indexOf(id), 1);
-    console.log(this.entityIds.length)
     delete this.entities[id];
   }
 
@@ -32,8 +27,11 @@ class Game extends Input {
     this.addEntity(new Box(x, y, width, height))
   }
   
-  addPlayer (x, y, width, height) {
-    this.addEntity(new Player(x, y, width, height))
+  addPlayer (x, y, width, height, charName) {
+    let player = new Player(x, y, width, height, charName)
+    this.playerIds.push(player.id);
+    player.addHealthBar(this.playerIds.length);
+    this.addEntity(player)
   }
   
   update() {

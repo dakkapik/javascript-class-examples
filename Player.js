@@ -1,14 +1,18 @@
 class Player extends Entity{
-  constructor (x, y, width, height) {
+  constructor (x, y, width, height, charName) {
     super();
     this.sprites = {
       idle: loadImage('assets/char_idle.png')
     }
-    //timer class
+
+    this.charName = charName;
+
+    this.maxHealth = 100;
+    this.health;
+
     this.currentSprite = this.sprites.idle
     this.x = x;
     this.y = y;
-    this.health = 100;
     this.xCenterOffset = width / 2;
     this.yCenterOffset = height / 2;
     this.width = width;
@@ -25,6 +29,7 @@ class Player extends Entity{
 
     this.faceRight = true;
 
+    this.damaged = false;
     this.attacking = false;
 
     this.attackTimer = 0;
@@ -39,23 +44,25 @@ class Player extends Entity{
     this.color = "rgba(0,0,255,0.2)";
   
     this.attacks = {}
-    this.attackNames = null;
+    this.attackNames = [];
 
     this.attackEntitiIndex = null;
 
-    this.keys = {
-      left: 65,
-      right:68,
-      jump:32
-    }
-
-    this.addAttack(30, 30, 70, 'punch','assets/char_attack.png', 10,  5,  1, 10, 10);
-    this.addAttack(40, 20, 82, 'kick', 'assets/char_attack.png', 30, 30, 20, 20, 30);
-    this.addAttack(15, 25, 69, 'grab', 'assets/char_attack.png', 30, 10, -1, 25, 15);
+    this.keys = {};
 
     this.jobSet.push("draw")
     this.jobSet.push("gravity")
     this.jobSet.push("move")
+  }
+
+  addHealthBar (index) {
+    this.health = new HealthBar(index, 20, this.charName, this.maxHealth)
+  }
+
+  addMoveKeys (keys){
+    Object.entries(keys).forEach(([key, value]) => {
+      this.keys[key] = value;
+    })
   }
 
   enableMove(settings){
@@ -84,7 +91,7 @@ class Player extends Entity{
   addAttack (
     w, h, keyCode, name, spritePath, 
     duration, cooldown, knockback, damage, 
-    yoffset, xoffset)
+    yOffset, xOffset)
     {
 
     this.sprites[name] = loadImage(spritePath);
@@ -92,7 +99,7 @@ class Player extends Entity{
     this.attacks[name] = new Attack(
       w, h, duration, 
       cooldown, knockback, 
-      damage, yoffset, xoffset
+      damage, yOffset, xOffset
       );
 
     this.keys[name] = keyCode;
@@ -222,6 +229,7 @@ class Player extends Entity{
       image(this.currentSprite, - this.x - this.width, this.y)
       pop()
     }
+    this.health.draw();
     this.attackLogic();
   }
 
@@ -252,8 +260,13 @@ class Player extends Entity{
         } else {
           this.xVelocity = -attack.knockback;
         }
+
+        if(!attack.hit) {
+          this.health.reduce(attack.damage);
+          attack.hit = true;
+        }
+
         break;
-        // setTimeout(()=> this.xVelocity = 0, 50)
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
       break;
@@ -294,19 +307,20 @@ class Attack extends Entity {
   constructor(
     width, height, duration, 
     cooldown, knockback, damage, 
-    yOffSet = 0, xOffSet=0) {
-
-    super();
+    yOffSet, xOffSet) {
+      super();
+      
     this.duration = duration;
     this.cooldown = cooldown;
     this.knockback = knockback;
     this.damage = damage;
+    this.hit = false;
     this.active = false;
     this.width = width;
     this.height = height;
     this.yOffSet = yOffSet;
     this.xOffSet = xOffSet;
-
+    
     /*
       FEATURES to add
 
@@ -320,6 +334,7 @@ class Attack extends Entity {
 
   activate(){
     this.active = true;
+    this.hit = false;
     game.addEntity(this);
   }
   
