@@ -9,8 +9,8 @@ function setup() {
   addPlayer function => 
     x, y, width, height, characterName
   */
-  game.addPlayer(100, 10, 40, 80, "Aurelian");
-  game.addPlayer(300, 10, 40, 80, "Guideon");
+  let p1 = game.addPlayer(100, 10, 40, 80, "Aurelian");
+  let p2 = game.addPlayer(300, 10, 40, 80, "Guideon");
 
   /*
   addBox function => 
@@ -18,16 +18,10 @@ function setup() {
   */
 
   let box1 = game.addBox(0,350, 900,50);
-  game.addBox(0, 0, 10,350);
-  game.addBox(590, 0, 10, 350);
+  let box2 = game.addBox(0, 0, 10,350);
+  let box3 = game.addBox(590, 0, 10, 350);
 
   box1.color="yellow"
-  
-  /*
-  we take a reference to the stored player and we modify them like this
-  */
-  let p1 = game.entities[game.entityIds[0]];
-  let p2 = game.entities[game.entityIds[1]];
   
   /*
    addAttack command order => 
