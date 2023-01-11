@@ -17,9 +17,11 @@ function setup() {
     x, y, width, height
   */
 
-  game.addBox(0,350, 900,50);
+  let box1 = game.addBox(0,350, 900,50);
   game.addBox(0, 0, 10,350);
   game.addBox(590, 0, 10, 350);
+
+  box1.color="yellow"
   
   /*
   we take a reference to the stored player and we modify them like this
@@ -36,6 +38,7 @@ function setup() {
   p1.addAttack(20, 20, 82, 'kick', 'assets/char_kick.png',  30, 30, 20, 20, 50, -50);
   p1.addAttack(15, 25, 69, 'grab', 'assets/char_bills.png', 30, 10, -1, 25, 15);
   
+  p2.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10)
   /*
   addMoveKeys => 
   ***take object with move key value pairs

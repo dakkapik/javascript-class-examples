@@ -24,14 +24,17 @@ class Game extends Input {
   }
 
   addBox (x, y, width, height) {
-    this.addEntity(new Box(x, y, width, height))
+    let box = new Box(x, y, width, height);
+    this.addEntity(box);
+    return box;
   }
   
   addPlayer (x, y, width, height, charName) {
     let player = new Player(x, y, width, height, charName)
     this.playerIds.push(player.id);
     player.addHealthBar(this.playerIds.length);
-    this.addEntity(player)
+    this.addEntity(player);
+    return player;
   }
   
   update() {
