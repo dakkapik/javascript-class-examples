@@ -25,17 +25,17 @@ function setup() {
   
   /*
    addAttack command order => 
-   1. width
-   2. height
-   3. keyCode
-   4. name
-   5. spritePath
-   6. duration
-   7. cooldown
-   8. knockback
-   9. damage
-   10. yOffset <optional>
-   11. xOffset <optional>
+    1. width
+    2. height
+    3. keyCode
+    4. name
+    5. spritePath
+    6. duration
+    7. cooldown
+    8. knockback
+    9. damage
+    10. yOffset <optional>
+    11. xOffset <optional>
    */
   
   p1.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10);
