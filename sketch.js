@@ -32,15 +32,16 @@ function setup() {
     5. spritePath
     6. duration
     7. cooldown
-    8. knockback
+    8. xKnockback
+    8. yKnockback
     9. damage
     10. yOffset <optional>
     11. xOffset <optional>
    */
   
-  p1.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10);
-  p1.addAttack(20, 20, 82, 'kick', 'assets/char_kick.png',  30, 30, 20, 20, 50, -50);
-  p1.addAttack(15, 25, 69, 'grab', 'assets/char_bills.png', 30, 10, -1, 25, 15);
+  p1.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1,0, 10, 10);
+  p1.addAttack(20, 20, 82, 'kick', 'assets/char_kick.png',  30, 30, 20,4, 20, 50, -50);
+  p1.addAttack(15, 25, 69, 'grab', 'assets/char_bills.png', 30, 10, -1,0, 25, 15);
   
   p2.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10)
   /*

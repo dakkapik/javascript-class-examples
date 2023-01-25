@@ -90,7 +90,7 @@ class Player extends Entity{
 
   addAttack (
     w, h, keyCode, name, spritePath, 
-    duration, cooldown, knockback, damage, 
+    duration, cooldown, xKnockback, yKnockback, damage, 
     yOffset, xOffset)
     {
 
@@ -98,7 +98,7 @@ class Player extends Entity{
 
     this.attacks[name] = new Attack(
       w, h, duration, 
-      cooldown, knockback, 
+      cooldown,xKnockback, yKnockback, 
       damage, yOffset, xOffset
       );
 
@@ -256,9 +256,11 @@ class Player extends Entity{
         let attack = game.entities[entitieIndex]  
 
         if(game.entities[entitieIndex].x < this.x){
-          this.xVelocity = attack.knockback;
+          this.xVelocity = attack.xKnockback;
+          this.yVelocity = -attack.yKnockback;
         } else {
-          this.xVelocity = -attack.knockback;
+          this.xVelocity = -attack.xKnockback;
+          // this.yVelocity = attack.yKnockback;
         }
 
         if(!attack.hit) {
@@ -306,13 +308,14 @@ class Player extends Entity{
 class Attack extends Entity {
   constructor(
     width, height, duration, 
-    cooldown, knockback, damage, 
+    cooldown, xKnockback, yKnockback, damage, 
     yOffSet, xOffSet) {
       super();
       
     this.duration = duration;
     this.cooldown = cooldown;
-    this.knockback = knockback;
+    this.xKnockback = xKnockback;
+    this.yKnockback = yKnockback;
     this.damage = damage;
     this.hit = false;
     this.active = false;
