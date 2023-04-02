@@ -2,7 +2,7 @@ class Player extends Entity{
   constructor (x, y, width, height, charName, idleSprite) {
     super();
     this.sprites = {
-      idle: loadImage(`assets/${idleSprite}.png`)
+      idle: loadImage(idleSprite)
     }
 
     this.charName = charName;
@@ -88,18 +88,20 @@ class Player extends Entity{
 
   }
 
-  addAttack (attack, spritePath, keyCode)
+  addAttack (w, h, keyCode, name, spritePath, 
+    duration, cooldown, xKnockback, yKnockback, damage, 
+    yOffset, xOffset)
     {
 
-    this.sprites[attack.name] = loadImage(spritePath);
+    this.sprites[name] = loadImage(spritePath);
 
-    this.attacks[attack.name] = new Attack(
+    this.attacks[name] = new Attack(
       w, h, duration, 
       cooldown,xKnockback, yKnockback, 
       damage, yOffset, xOffset
       );
 
-    this.keys[attack.name] = keyCode;
+    this.keys[name] = keyCode;
     this.attackNames = Object.keys(this.attacks);
   }
 
