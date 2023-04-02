@@ -88,21 +88,18 @@ class Player extends Entity{
 
   }
 
-  addAttack (
-    w, h, keyCode, name, spritePath, 
-    duration, cooldown, knockback, damage, 
-    yOffset, xOffset)
+  addAttack (attack, spritePath, keyCode)
     {
 
-    this.sprites[name] = loadImage(spritePath);
+    this.sprites[attack.name] = loadImage(spritePath);
 
-    this.attacks[name] = new Attack(
+    this.attacks[attack.name] = new Attack(
       w, h, duration, 
-      cooldown, knockback, 
+      cooldown,xKnockback, yKnockback, 
       damage, yOffset, xOffset
       );
 
-    this.keys[name] = keyCode;
+    this.keys[attack.name] = keyCode;
     this.attackNames = Object.keys(this.attacks);
   }
 
@@ -256,9 +253,11 @@ class Player extends Entity{
         let attack = game.entities[entitieIndex]  
 
         if(game.entities[entitieIndex].x < this.x){
-          this.xVelocity = attack.knockback;
+          this.xVelocity = attack.xKnockback;
+          this.yVelocity = -attack.yKnockback;
         } else {
-          this.xVelocity = -attack.knockback;
+          this.xVelocity = -attack.xKnockback;
+          // this.yVelocity = attack.yKnockback;
         }
 
         if(!attack.hit) {
@@ -305,14 +304,15 @@ class Player extends Entity{
 
 class Attack extends Entity {
   constructor(
-    width, height, duration, 
-    cooldown, knockback, damage, 
+    name, width, height, duration, 
+    cooldown, xKnockback, yKnockback, damage, 
     yOffSet, xOffSet) {
       super();
-      
+    this.name = name;
     this.duration = duration;
     this.cooldown = cooldown;
-    this.knockback = knockback;
+    this.xKnockback = xKnockback;
+    this.yKnockback = yKnockback;
     this.damage = damage;
     this.hit = false;
     this.active = false;
@@ -320,15 +320,6 @@ class Attack extends Entity {
     this.height = height;
     this.yOffSet = yOffSet;
     this.xOffSet = xOffSet;
-    
-    /*
-      FEATURES to add
-
-      damage model
-      knowback model
-      cooldown
-      time
-    */
     
   }
 
@@ -369,7 +360,10 @@ class Attack extends Entity {
   }
   
   update(x, y, xOffSet) {
+    /// how to do this????
+    // 
     this.xOffSet = xOffSet;
+    this.yOffSet = yOffSet;
     this.x = x;
     this.y = y;
   } 

@@ -9,8 +9,8 @@ function setup() {
   addPlayer function => 
     x, y, width, height, characterName
   */
-  game.addPlayer(100, 10, 40, 80, "Aurelian", "char_idle");
-  game.addPlayer(300, 10, 40, 80, "Guideon",  "char_idle");
+  let p1 = game.addPlayer(100, 10, 40, 80, "Aurelian");
+  let p2 = game.addPlayer(300, 10, 40, 80, "Guideon");
 
   /*
   addBox function => 
@@ -18,25 +18,30 @@ function setup() {
   */
 
   let box1 = game.addBox(0,350, 900,50);
-  game.addBox(0, 0, 10,350);
-  game.addBox(590, 0, 10, 350);
+  let box2 = game.addBox(0, 0, 10,350);
+  let box3 = game.addBox(590, 0, 10, 350);
 
   box1.color="yellow"
   
   /*
-  we take a reference to the stored player and we modify them like this
-  */
-  let p1 = game.entities[game.entityIds[0]];
-  let p2 = game.entities[game.entityIds[1]];
-  
-  /*
    addAttack command order => 
-   width, height, keyCode, name, spritePath, duration, cooldown, knockback, damage, yOffset, xOffset
+    1. width
+    2. height
+    3. keyCode
+    4. name
+    5. spritePath
+    6. duration
+    7. cooldown
+    8. xKnockback
+    8. yKnockback
+    9. damage
+    10. yOffset <optional>
+    11. xOffset <optional>
    */
   
-  p1.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10);
-  p1.addAttack(20, 20, 82, 'kick', 'assets/char_kick.png',  30, 30, 20, 20, 50, -50);
-  p1.addAttack(15, 25, 69, 'grab', 'assets/char_bills.png', 30, 10, -1, 25, 15);
+  p1.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1,0, 10, 10);
+  p1.addAttack(20, 20, 82, 'kick', 'assets/char_kick.png',  30, 30, 20,4, 20, 50, -50);
+  p1.addAttack(15, 25, 69, 'grab', 'assets/char_bills.png', 30, 10, -1,0, 25, 15);
   
   p2.addAttack(30, 30, 70, 'sword','assets/char_sword.png',10,  5,  1, 10, 10)
   /*
