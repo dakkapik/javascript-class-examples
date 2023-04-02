@@ -9,8 +9,8 @@ function setup() {
   addPlayer function => 
     x, y, width, height, characterName
   */
-  game.addPlayer(100, 10, 40, 80, "Aurelian");
-  game.addPlayer(300, 10, 40, 80, "Guideon");
+  game.addPlayer(100, 10, 40, 80, "Aurelian", "char_idle");
+  game.addPlayer(300, 10, 40, 80, "Guideon",  "char_idle");
 
   /*
   addBox function => 

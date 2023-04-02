@@ -1,8 +1,8 @@
 class Player extends Entity{
-  constructor (x, y, width, height, charName) {
+  constructor (x, y, width, height, charName, idleSprite) {
     super();
     this.sprites = {
-      idle: loadImage('assets/char_idle.png')
+      idle: loadImage(`assets/${idleSprite}.png`)
     }
 
     this.charName = charName;

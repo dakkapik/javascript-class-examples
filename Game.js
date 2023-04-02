@@ -29,8 +29,8 @@ class Game extends Input {
     return box;
   }
   
-  addPlayer (x, y, width, height, charName) {
-    let player = new Player(x, y, width, height, charName)
+  addPlayer (x, y, width, height, charName, spriteName) {
+    let player = new Player(x, y, width, height, charName, spriteName)
     this.playerIds.push(player.id);
     player.addHealthBar(this.playerIds.length);
     this.addEntity(player);
