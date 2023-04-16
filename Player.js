@@ -1,14 +1,18 @@
 class Player extends Entity{
-  constructor (x, y, width, height) {
+  constructor (x, y, width, height, charName, idleSprite) {
     super();
     this.sprites = {
-      idle: loadImage('assets/char_idle.png')
+      idle: loadImage(idleSprite)
     }
-    //timer class
+
+    this.charName = charName;
+
+    this.maxHealth = 100;
+    this.health;
+
     this.currentSprite = this.sprites.idle
     this.x = x;
     this.y = y;
-    this.health = 100;
     this.xCenterOffset = width / 2;
     this.yCenterOffset = height / 2;
     this.width = width;
@@ -25,6 +29,7 @@ class Player extends Entity{
 
     this.faceRight = true;
 
+    this.damaged = false;
     this.attacking = false;
 
     this.attackTimer = 0;
@@ -39,23 +44,25 @@ class Player extends Entity{
     this.color = "rgba(0,0,255,0.2)";
   
     this.attacks = {}
-    this.attackNames = null;
+    this.attackNames = [];
 
     this.attackEntitiIndex = null;
 
-    this.keys = {
-      left: 65,
-      right:68,
-      jump:32
-    }
-
-    this.addAttack(30, 30, 70, 'punch','assets/char_attack.png', 10,  5,  1, 10, 10);
-    this.addAttack(40, 20, 82, 'kick', 'assets/char_attack.png', 30, 30, 20, 20, 30);
-    this.addAttack(15, 25, 69, 'grab', 'assets/char_attack.png', 30, 10, -1, 25, 15);
+    this.keys = {};
 
     this.jobSet.push("draw")
     this.jobSet.push("gravity")
     this.jobSet.push("move")
+  }
+
+  addHealthBar (index) {
+    this.health = new HealthBar(index, 20, this.charName, this.maxHealth)
+  }
+
+  addMoveKeys (keys){
+    Object.entries(keys).forEach(([key, value]) => {
+      this.keys[key] = value;
+    })
   }
 
   enableMove(settings){
@@ -81,18 +88,17 @@ class Player extends Entity{
 
   }
 
-  addAttack (
-    w, h, keyCode, name, spritePath, 
-    duration, cooldown, knockback, damage, 
-    yoffset, xoffset)
+  addAttack (w, h, keyCode, name, spritePath, 
+    duration, cooldown, xKnockback, yKnockback, damage, 
+    yOffset=0, xOffset=0)
     {
 
     this.sprites[name] = loadImage(spritePath);
 
     this.attacks[name] = new Attack(
       w, h, duration, 
-      cooldown, knockback, 
-      damage, yoffset, xoffset
+      cooldown,xKnockback, yKnockback, 
+      damage, yOffset, xOffset
       );
 
     this.keys[name] = keyCode;
@@ -222,6 +228,7 @@ class Player extends Entity{
       image(this.currentSprite, - this.x - this.width, this.y)
       pop()
     }
+    this.health.draw();
     this.attackLogic();
   }
 
@@ -248,12 +255,19 @@ class Player extends Entity{
         let attack = game.entities[entitieIndex]  
 
         if(game.entities[entitieIndex].x < this.x){
-          this.xVelocity = attack.knockback;
+          this.xVelocity = attack.xKnockback;
+          this.yVelocity = -attack.yKnockback;
         } else {
-          this.xVelocity = -attack.knockback;
+          this.xVelocity = -attack.xKnockback;
+          // this.yVelocity = attack.yKnockback;
         }
+
+        if(!attack.hit) {
+          this.health.reduce(attack.damage);
+          attack.hit = true;
+        }
+
         break;
-        // setTimeout(()=> this.xVelocity = 0, 50)
       default :
         console.log("Player to:", game.entities[entitieIndex].constructor.name )
       break;
@@ -288,75 +302,4 @@ class Player extends Entity{
       this.attacks[this.currentAttack].deactivate();
     }
   }
-}
-
-class Attack extends Entity {
-  constructor(
-    width, height, duration, 
-    cooldown, knockback, damage, 
-    yOffSet = 0, xOffSet=0) {
-
-    super();
-    this.duration = duration;
-    this.cooldown = cooldown;
-    this.knockback = knockback;
-    this.damage = damage;
-    this.active = false;
-    this.width = width;
-    this.height = height;
-    this.yOffSet = yOffSet;
-    this.xOffSet = xOffSet;
-
-    /*
-      FEATURES to add
-
-      damage model
-      knowback model
-      cooldown
-      time
-    */
-    
-  }
-
-  activate(){
-    this.active = true;
-    game.addEntity(this);
-  }
-  
-  deactivate(){
-    if(this.active) {
-      game.removeEntity(this.id);
-      this.active = false;
-      return
-    } 
-    return
-  }
-
-  draw() {
-    fill('rgba(255,0,0,0.2)');
-    rect(this.x + this.xOffSet, this.y + this.yOffSet, this.width, this.height);
-  }
-
-  getUp() {
-    return this.y + this.yOffSet;
-  }
-
-  getLeft() {
-    return this.x + this.xOffSet;
-  }
-
-  getDown() {
-    return this.y + this.yOffSet + this.height;
-  }
-
-  getRight() {
-    return this.x + this.xOffSet + this.width;
-  }
-  
-  update(x, y, xOffSet) {
-    this.xOffSet = xOffSet;
-    this.x = x;
-    this.y = y;
-  } 
-
 }
